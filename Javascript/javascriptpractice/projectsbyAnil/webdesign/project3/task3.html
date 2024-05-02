@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form</title>
+    <style>
+        #Container{
+            margin:20% 25%;
+            background-color: #eac457;
+            width: 50%;
+            height: 400px;
+            display: flex;
+            justify-content:space-between;
+        }
+        #subcontainer{
+            margin:12% 20%;
+        }
+        .tableedit{
+            margin:0 10px;
+            background-color: aliceblue;
+            padding: 25px;
+        }
+        th,tbody{
+            padding:0 85px;
+            border: none;
+            text-align: center;
+        }
+        button{
+            color: white;
+            background-color: black;
+            padding: 8px;
+            margin: 0;
+        }
+        #btn1{
+            padding: 8px;
+            margin: 25px 59px;
+        }
+        #Container input{
+            background-color: white;
+            padding: 12px;
+            border: none;
+            justify-content: center;
+            text-align: center;
+
+        }
+    </style>
+</head>
+<body> 
+    <div id="Container">
+        <div id="subcontainer">
+            <h1>To DO List</h1>
+            <dIv>
+                <input type="text" placeholder="Input the text here" id="taskTodo">
+                <button id="btn1" onclick="clickfun()">ADD</button>
+            </div>
+            </dIv>
+            <div class="tableedit" >
+                <table id="tablediv1" border="1">
+                  <thead>
+                    <tr>
+                        <th rowspan="2">Choose here</th>
+                        <th>Your cart</th>
+                        <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablediv">
+
+                  </tbody>
+
+                </table>
+            </div>
+</div>
+<script> 
+ let trow =document.createElement("tr");
+
+ function clickfun() {
+    let outputval = document.getElementById("taskTodo").value;
+    let table = document.getElementById("tablediv");
+    let existingData = JSON.parse(localStorage.getItem('inputs')) || [];
+    let objlocal = {
+        name: outputval,
+    };
+
+    existingData.push(objlocal);
+    localStorage.setItem('inputs', JSON.stringify(existingData));
+
+    let newRow = document.createElement("tr");
+    let cell0 = newRow.insertCell(0);
+    let cell1 = newRow.insertCell(1);
+    let cell2 = newRow.insertCell(2);
+
+    cell0.innerHTML = `<input type="checkbox" name="checkbox">`;
+    cell1.innerHTML = `<span class="taskText">${outputval}</span>
+                       <input type="text" class="editInput" style="display: none;">`;
+    cell2.innerHTML = `<button class="deleteBtn">DEL</button>
+                       <button class="editBtn">EDIT</button>
+                       <button class="cancelBtn">Save</button>
+                       <button class="restoreBtn" style="display: none; >RESTORE</button>`;
+
+    table.appendChild(newRow);
+
+    // Add event listeners to the newly created delete, edit, and cancel buttons
+    let deleteBtns = document.querySelectorAll('.deleteBtn');
+    let editBtns = document.querySelectorAll('.editBtn');
+    let cancelBtns = document.querySelectorAll('.cancelBtn');
+    let restoreBtns = document.querySelector('.restoreBtn')
+    let choosebox = document.getElementsByName('checkbox')
+
+    choosebox.forEach(btn => {
+        btn.addEventListener('click',function(){
+            let choosed=choosebox==true;
+        if(choosed){
+            displaybtns()
+        }else{
+            // !displaybtns();
+        }
+        })
+  
+
+    deleteBtns.forEach(btn => {
+        btn.addEventListener('click', deleteTask);
+    });
+
+    editBtns.forEach(btn => {
+        btn.addEventListener('change', editTask);
+    });
+
+    cancelBtns.forEach(btn => {
+        btn.addEventListener('click', cancelEdit);
+    });
+    restoreBtns.forEach(btn => {
+        btn.addEventListener('click', restoretask);
+    });
+
+    function displaybtns() {
+    deleteBtns.style.display='block';
+    editBtns.style.display='block';
+    cancelBtns.style.display='block';
+
+}
+
+});
+
+
+function editTask() {
+    let row = this.parentNode.parentNode;
+    let taskText = row.querySelector('.taskText');
+    let editInput = row.querySelector('.editInput');
+
+    taskText.style.display = 'none';
+    editInput.style.display = 'inline-block';
+    editInput.value = taskText.textContent;
+
+    // Focus on the input field
+    editInput.focus();
+
+    // Save changes when user presses Enter
+    editInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            taskText.textContent = editInput.value;
+            taskText.style.display = 'inline-block';
+            editInput.style.display = 'none';
+
+            // Update task text in local storage
+            let taskIndex = Array.from(row.parentNode.rows).indexOf(row);
+            let existingData = JSON.parse(localStorage.getItem('inputs')) || [];
+            existingData[taskIndex].name = editInput.value;
+            localStorage.setItem('inputs', JSON.stringify(existingData));
+        }
+    });
+
+    // Save changes when user clicks outside the input field
+    editInput.addEventListener('blur', function() {
+        taskText.textContent = editInput.value;
+        taskText.style.display = 'inline-block';
+        editInput.style.display = 'none';
+
+        // Update task text in local storage
+        let taskIndex = Array.from(row.parentNode.rows).indexOf(row);
+        let existingData = JSON.parse(localStorage.getItem('inputs')) || [];
+        existingData[taskIndex].name = editInput.value;
+        localStorage.setItem('inputs', JSON.stringify(existingData));
+    });
+}
+
+function cancelEdit() {
+    let row = this.parentNode.parentNode;
+    let taskText = row.querySelector('.taskText');
+    let editInput = row.querySelector('.editInput');
+
+    taskText.style.display = 'inline-block';
+    editInput.style.display = 'none';
+}
+function deleteTask() {
+    let row = this.parentNode.parentNode;
+    row.parentNode.removeChild(row); // Remove the row from its parent node
+
+    // Get the index of the row in the table and update the localStorage
+    let taskIndex = Array.from(row.parentNode.rows).indexOf(row);
+    let existingData = JSON.parse(localStorage.getItem('inputs')) || [];
+    existingData.splice(taskIndex, 1);
+    localStorage.setItem('inputs', JSON.stringify(existingData));
+}
+    
+    
+    
+    // Remove task from local storage
+    
+}
+</script>    
+</body>
+
+</html>

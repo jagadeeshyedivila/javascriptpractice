@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BYJUS</title>
+    <style>
+        body {
+            margin: 10px;
+        }
+        .popup, .popup2 {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #ccc;
+            z-index: 1;
+            border-radius: 5px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 50%);
+        }
+        button {
+            background-color: rgb(114, 197, 203);
+        }
+        input {
+            height: 20px;
+            width: 450px;
+            border-radius: 8px;
+            padding: 4px 13px;
+            border: .5px solid black;
+        }
+        button {
+            padding: 10px 30px;
+            border: none;
+            background: #df6807ca;
+            border-radius: 5px;
+            color: white;
+            font-size: medium;
+        }
+        .action {
+            display: flex;
+            justify-content: space-between;
+        }
+        .saveBtn {
+            background: #042788;
+        }
+        .close {
+            background: #e73d09;
+        }
+        .delintable, .editintable {
+            width: 50px;
+            text-align: center;
+            padding: 5px;
+            margin: auto;
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <button onclick="openLogin()">Login</button>
+    <button onclick="openRegister()">Signup</button>
+    <table id="tableid" border="1">
+        <tr id="Action">
+            <th>S.no</th>
+            <th>Username</th>
+            <th>Phone Number</th>
+            <th>Student ID</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
+        <tbody></tbody>
+    </table>
+
+    <div class="popup" id="loginForm">
+        <form>
+            <h3>Login</h3>
+            <input type="text" id="username" name="username" placeholder="Username"><br><br>
+            <input type="password" id="password" name="password" placeholder="Password"><br><br>
+            <input type="text" id="otp" name="otp" placeholder="OTP"><br><br>
+            <div class="action">
+                <button type="button" class="close" onclick="cancelBtn()">Cancel</button>
+                <button type="button" class="saveBtn" onclick="saveForm()">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="popup2" id="registerForm">
+      <h1>Sign up</h1>
+        <label for="Username">Username:</label><br>
+        <input type="text" id="Username" name="Username"><br>
+        <label for="Phno">Ph.No:</label><br>
+        <input type="text" id="Phno" name="Phno"><br>
+        <label for="StudentId">Studentid:</label><br>
+        <input type="text" id="StudentId" name="StudentId"><br>
+        <label for="Email">Email:</label><br>
+        <input type="text" id="Email" name="Email"><br>
+
+        <div class="action">
+            <button type="button" class="close" onclick="cancelBtn()">Cancel</button>
+            <button type="button" class="saveBtn" onclick="registerdata()">Register</button>
+        </div>
+    </div>
+    <div class="popup2" id="editform">
+      <input type="text" id="editSno">
+      <label for="Username">Username:</label><br>
+      <input type="text" id="editUsername" name="Username"><br>
+      <label for="Phno">Ph.No:</label><br>
+      <input type="text" id="editPhoneNumber" name="Phno"><br>
+      <label for="StudentId">Studentid:</label><br>
+      <input type="text" id="editStudentID" name="StudentId"><br>
+      <label for="Email">Email:</label><br>
+      <input type="text" id="editEmail" name="Email"><br>
+
+      <div class="action">
+          <button type="button" class="close" onclick="cancelBtn()">Cancel</button>
+          <button onclick="editRow(this)">Edit</button>
+
+      </div>
+  </div>
+  
+    <script>
+        let serialNumber = 1;
+let existingData  =[];
+        function cancelBtn() {
+            document.getElementById("loginForm").style.display = "none";
+            document.getElementById("registerForm").style.display = "none";
+        }
+
+        function openLogin() {
+            document.getElementById("registerForm").style.display = "none";
+            document.getElementById("loginForm").style.display = "block";
+        }
+
+        function openRegister() {
+            document.getElementById("loginForm").style.display = "none";
+            document.getElementById("registerForm").style.display = "block";
+        }
+
+        function saveForm() {
+            confirm("Form saved!");
+            document.getElementById("loginForm").style.display = "none";
+            document.getElementById("username").value=username;
+            document.getElementById("password").value=password;
+            document.getElementById("otp").value=otp;
+            let logindata = {
+              username:username.innerText,
+              password:password.innerText,
+              otp:otp.innerText,
+            }
+
+            let existingData = JSON.parse(localStorage.getItem('users')) || [];
+
+            existingData.push(logindata);
+            localStorage.setItem('users', JSON.stringify(existingData));
+ console.log(existingData);
+        } 
+
+        function registerdata() {
+            let Usernameclick = document.getElementById("Username").value;
+            let Phnoclick = document.getElementById("Phno").value;
+            let StudentIdclick = document.getElementById("StudentId").value;
+            let Emailclick = document.getElementById("Email").value;
+
+            let table = document.getElementById("tableid");
+            let newRow = table.insertRow(table.rows.length);
+
+            let cell0 = newRow.insertCell(0);
+            let cell1 = newRow.insertCell(1);
+            let cell2 = newRow.insertCell(2);
+            let cell3 = newRow.insertCell(3);
+            let cell4 = newRow.insertCell(4);
+            let cell5 = newRow.insertCell(5);
+
+            cell0.innerHTML = serialNumber++;
+            cell1.innerHTML = Usernameclick;
+            cell2.innerHTML = Phnoclick;
+            cell3.innerHTML = StudentIdclick;
+            cell4.innerHTML = Emailclick;
+            cell5.innerHTML = `<button class="delintable" onclick="deleteRow( this)">DEL</button>
+                               <button class="editintable" onclick="editRow(this)">EDIT</button>`;
+        }
+
+        function deleteRow(button) {
+            // let row = button.parentNode.parentNode;
+            // row.parentNode.removeChild(row);
+        console.log("clicks on delete");
+        }
+
+        function editRow(button) {
+          let table=document.getElementById("tableid");
+            // let row =table.row;
+            let row = button.parentNode.parentNode;
+            // You can implement edit functionality here
+            // For example, populate a form with the row data and allow editing
+            let cells=row.cells;    
+
+    console.log("Row:", row); 
+    console.log("Cells:", cells);
+        let serialNumber=cells[0].innerText;
+        let username = cells[1].innerText;
+        let phoneNumber = cells[2].innerText;
+        let studentID = cells[3].innerText;
+        let email = cells[4].innerText;
+
+
+        document.getElementById("editform").style.display="block";
+        document.getElementById("editSno").value = serialNumber;
+        document.getElementById("editUsername").value = username;
+        document.getElementById("editPhoneNumber").value = phoneNumber;
+        document.getElementById("editStudentID").value = studentID;
+        document.getElementById("editEmail").value = email;
+          }
+          
+    </script>
+</body>
+</html>
+<!-- <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>BYJUS</title>
+  <style>
+
+  body{
+      margin: 10px;
+  }
+  .popup,.popup2{
+    display: none;
+    position: absolute;
+    
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ccc;
+    z-index:1;
+      border-radius: 5px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50% 50%);
+
+  }
+  button{
+      background-color: rgb(114, 197, 203);
+  }
+
+  input{
+      height: 20px; 
+      width: 450px;
+      border-radius: 8px;
+      padding: 4px 13px;
+      border: .5px solid black;
+  }
+  button{
+      padding: 10px 30px;
+      border: none;
+      background: #df6807ca;
+      border-radius: 5px;
+      color: white;
+  font-size: medium;
+  }
+  .action{
+      display: flex;
+      justify-content: space-between;
+  }
+  .saveBtn{
+      background: #042788;
+  }
+  .close{
+      background: #e73d09;
+
+  }
+  .delintable,.editintable{
+    width: 50px;
+    text-align: center;
+    padding: 5px;
+    margin: auto;
+    background-color: red;
+  }
+  </style>
+  </head>
+  <body>
+    <div class="main-container">
+      <button onclick="openLogin()">Login</button>
+      <button onclick="openRegister()">Signup</button>
+      <table id="tableid" border="1">
+        <tr id="Action">
+          <th>S.no</th>
+            <th>Username</th>
+            <th>Phone Number</th>
+            <th>Student ID</th>
+            <th>Email</th>
+            <th >Action</th>
+          </tr>
+          <tbody>
+
+          </tbody>
+  </table>
+
+      <div class="popup" id="loginForm">
+        <form>
+          <h3>Login</h3>
+          <input type="text" id="username" name="username" placeholder="Username"><br><br>
+          <input type="password" id="password" name="password" placeholder="Password"><br><br>
+          <input type="text" id="otp" name="otp" placeholder="OTP"><br><br>
+        <div class="action">
+          <button type="button" class="close" onclick="cancelBtn()"> cancel</button>
+          <button type="button" class="saveBtn" onclick="saveForm()">Save</button>
+        </div>
+        </form>
+      </div>
+      
+      <div class="popup2"  id="registerForm">
+          <label for="username">Username:</label><br>
+          <input type="text" id="Username" name="username"><br>  
+          <label for="Phno">Ph.No:</label><br>
+          <input type="text" id="Phno" name="phno"><br>      
+          <label for="StudentId">Studentid:</label><br>
+          <input type="text" id="StudentId" name="StudentId"><br>
+          <label for="Email">email:</label><br>
+          <input type="text" id="Email" name="Email"><br>
+          
+          <div class="action">
+              <button type="button" class="close" onclick="cancelBtn()"> cancel</button>
+              <button type="button" class="saveBtn" onclick="registerdata()">Register</button>
+            </div>  
+            
+          </div>
+      <script>
+        let serialNumber = 1;
+
+    let gettable = document.getElementById("tbody");
+  function cancelBtn( ) {
+    document.getElementById("loginForm").style.display = "none";
+    document.getElementById("registerForm").style.display = "none";
+
+      
+  }
+  function openLogin() {
+    document.getElementById("registerForm").style.display = "none";
+
+    document.getElementById("loginForm").style.display = "block";
+  }
+  function openRegister() {
+    document.getElementById("loginForm").style.display = "none";
+
+    document.getElementById("registerForm").style.display = "block";
+  } 
+
+
+  function saveForm() {
+
+    confirm("Form saved!");
+    document.getElementById("myForm").style.display = "none";
+  }
+
+  function registerdata(){
+    let Usernameclick= document.getElementById("Username").value;
+    let Phnoclick= document.getElementById("Phno").value;
+    let StudentIdclick = document.getElementById("StudentId").value;
+  let Emailclick = document.getElementById("Email").value;
+  let Actionclick =document.getElementById("Action");
+    
+    let table = document.getElementById("tableid") 
+  let newRow = table.insertRow(table.rows.length);  
+   
+  let cell0 = newRow.insertCell(0);
+  let cell1 = newRow.insertCell(1);
+  let cell2 = newRow.insertCell(2);
+  let cell3 = newRow.insertCell(3);
+  let cell4 = newRow.insertCell(4);
+  let cell5 = newRow.insertCell(5);
+
+  cell0.innerHTML = serialNumber++;
+  cell1.innerHTML = Usernameclick;
+  cell2.innerHTML = Phnoclick;
+  cell3.innerHTML = StudentIdclick;
+  cell4.innerHTML = Emailclick;
+  cell5.innerHTML =` <button  class="delintable" onclick="deleteRow()">DEL</button>
+        <button  class=" editintable" onclick="editRow()">EDIT</button>`
+  
+  }
+  function deleteRow(button) {
+let row  = button.parentNode.parentNode;
+row.parentNode.removeChild(row)
+  }
+  function editRow(button) {
+            let row = button.parentNode.parentNode;
+  }
+      </script>
+  </body>
+  </html>
+
+
+  <!-- 
+
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Table</title>
+  <style>
+      table {
+          border-collapse: collapse;
+          width: 100%;
+      }
+
+      th, td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: left;
+      }
+
+      th {
+          background-color: #f2f2f2;
+      }
+  </style>
+  </head>
+  <body>
+
+  <h2>Dynamic Table</h2>
+
+  <form id="dataForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name">
+      <label for="age">Age:</label>
+      <input type="text" id="age" name="age">
+      <button type="button" onclick="addData()">Add Data</button>
+  </form>
+
+  <table id="dataTable">
+      <tr>
+          <th>Name</th>
+          <th>Age</th>
+      </tr>
+  </table>
+
+  <script>
+  function addData() {
+      var name = document.getElementById("name").value;
+      var age = document.getElementById("age").value;
+
+      var table = document.getElementById("dataTable");
+      var newRow = table.insertRow(-1); // Insert row at the end of the table
+
+      var cell1 = newRow.insertCell(0);
+      var cell2 = newRow.insertCell(1);
+
+      cell1.innerHTML = name;
+      cell2.innerHTML = age;
+  }
+  </script>
+
+  </body>
+  </html>
+  -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ -->
